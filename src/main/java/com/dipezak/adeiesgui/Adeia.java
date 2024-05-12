@@ -1,12 +1,8 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.dipezak.adeiesgui;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 /**
@@ -18,8 +14,8 @@ public class Adeia {
     private String lastName;
     private String firstName;
     private String type; // Αιμοδοτική, ΑΝΑΡΡΩΤΙΚΗ - με Ιατρική Γνωμάτευση, Κανονική, Για ετήσιο γυναικολογικό έλεγχο, Ασθένειας τέκνου ktl
-    private Date startDate;
-    private Date endDate; 
+    private LocalDate startDate;
+    private LocalDate endDate; 
     private String from;
     
     private String matchType(String type) {
@@ -122,19 +118,19 @@ public class Adeia {
         this.type = matchType(type);
     }
 
-    public Date getStartDate() {
+    public LocalDate getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(Date startDate) throws ParseException {
+    public void setStartDate(LocalDate startDate) throws ParseException {
          this.startDate = startDate;
     }
 
-    public Date getEndDate() {
+    public LocalDate getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(Date endDate) throws ParseException {
+    public void setEndDate(LocalDate endDate) throws ParseException {
         this.endDate = endDate;
     }
 
@@ -150,7 +146,7 @@ public class Adeia {
 
     @Override
     public String toString() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         return "afm=" + afm + "\t lastName=" + lastName + "\t firstName=" + firstName + 
                 "\t type=" + type + "\t startDate=" + dateFormat.format(startDate) + "\t endDate=" + dateFormat.format(endDate) + '\n';
     }   
@@ -185,7 +181,7 @@ public class Adeia {
     }
 
     public String toCSVString() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         return "\'" + afm + "\';" + lastName + ";" + firstName + ";" + type + ";" + 
                 dateFormat.format(startDate) + ";" + dateFormat.format(endDate) +
                 ";" + from + '\n';
@@ -211,7 +207,7 @@ public class Adeia {
         this.from = a.getFrom();
     }
     
-    public Adeia(String afm, String lastName, String firstName, String type, String status, Date startDate, Date endDate, String from) {
+    public Adeia(String afm, String lastName, String firstName, String type, String status, LocalDate startDate, LocalDate endDate, String from) {
         this.afm = afm;
         this.lastName = lastName;
         this.firstName = firstName;

@@ -1,6 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- */
 package com.dipezak.adeiesgui;
 
 import com.opencsv.CSVParser;
@@ -17,16 +14,15 @@ import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.Period;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
-import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 
 /**
  *
@@ -61,7 +57,6 @@ public class Adeies {
             System.out.println("Couldn't write to file.");
             return false;
         }
-
         return true;
     }
 
@@ -84,49 +79,36 @@ public class Adeies {
                     return sComp;
                 }
 
-                Date d1 = ((Adeia) o1).getStartDate();
-                Date d2 = ((Adeia) o2).getStartDate();
+                LocalDate d1 = ((Adeia) o1).getStartDate();
+                LocalDate d2 = ((Adeia) o2).getStartDate();
                 return d1.compareTo(d2);
             }
         });
     }
 
-    static int weekendCount(Date startDate, Date endDate) {
-        LocalDate startDateLocalDate = startDate.toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDate();
-        LocalDate endDateLocalDate = endDate.toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDate();
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(startDate);
-        long diffInDays = ChronoUnit.DAYS.between(startDateLocalDate, endDateLocalDate);
+    static int weekendCount(LocalDate startDate, LocalDate endDate) {
+        long diffInDays = ChronoUnit.DAYS.between(startDate, endDate);
         int cnt = 0;
         for (int i = 1; i <= diffInDays; i++) {
-            int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
-            /*if (dayOfWeek == Calendar.SUNDAY || dayOfWeek == Calendar.SATURDAY) {
-                cnt++;
-            }*/
-            if (dayOfWeek == Calendar.SATURDAY) { // Το ΣΚ πάει πακέτο!
+            DayOfWeek dayOfWeek = startDate.getDayOfWeek();
+            if (dayOfWeek == DayOfWeek.SATURDAY) { // Το ΣΚ πάει πακέτο!
                 cnt++;
                 cnt++;
             }
-            calendar.add(Calendar.DATE, 1);
+            startDate = startDate.plusDays(1);
         }
         return cnt;
     }
 
-    static int weekendCount(Date startDate, int days) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(startDate);
+    static int weekendCount(LocalDate startDate, int days) {
         int cnt = 0;
         for (int i = 1; i <= days; i++) {
-            int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
-            if (dayOfWeek == Calendar.SATURDAY) { // Το ΣΚ πάει πακέτο!
+            DayOfWeek dayOfWeek = startDate.getDayOfWeek();
+            if (dayOfWeek == DayOfWeek.SATURDAY) { // Το ΣΚ πάει πακέτο!
                 cnt++;
                 cnt++;
             }
-            calendar.add(Calendar.DATE, 1);
+            startDate = startDate.plusDays(1);
         }
         return cnt;
     }
@@ -191,16 +173,14 @@ public class Adeies {
     // Ελέγχει αν υπάρχουν συνεχόμενες άδειες χωρίς τα ΣΚ 
     static void extraMySchoolCheck(List<Adeia> diffList) throws ParseException {
         int i = 0;
-
         // Συνένωση αδειών ασθενείας με συνεχόμενες ημερομηνίες στο MySchool
         while (i < diffList.size() - 1) {
             Adeia current = diffList.get(i);
             Adeia next = diffList.get(i + 1);
-            long diff = current.getEndDate().getTime() - next.getStartDate().getTime();
-            long diffDays = diff / (1000 * 60 * 60 * 24);
+            Period period = Period.between(current.getEndDate(), next.getStartDate());
             if (current.getAfm().equals(next.getAfm())) {
                 if (current.getType().equals(next.getType())) {
-                    if (diffDays == -1) {
+                    if (period.getDays() == 1) {
                         Adeia replacement = new Adeia(current);
                         replacement.setEndDate(next.getEndDate());
                         diffList.remove(i);
@@ -213,31 +193,25 @@ public class Adeies {
 
         // MySchool - Αν η κανονική άδεια περιλαμβάνει ΣΚ σπάσιμο στα 2
         i = 0;
-
         while (i < diffList.size()) {
             if (diffList.get(i).getType().equals("ΑΔΕΙΑ ΚΑΝΟΝΙΚΗ")) {
                 if (weekendCount(diffList.get(i).getStartDate(), diffList.get(i).getEndDate()) > 0) {
-                    LocalDate startDateLocalDate = diffList.get(i).getStartDate().toInstant()
-                            .atZone(ZoneId.systemDefault())
-                            .toLocalDate();
-                    LocalDate endDateLocalDate = diffList.get(i).getEndDate().toInstant()
-                            .atZone(ZoneId.systemDefault())
-                            .toLocalDate();
+                    LocalDate startDateLocalDate = diffList.get(i).getStartDate();
+                    LocalDate endDateLocalDate = diffList.get(i).getEndDate();
                     long diffInDays = ChronoUnit.DAYS.between(startDateLocalDate, endDateLocalDate);
                     Adeia ending = new Adeia(diffList.get(i));
-                    Calendar calendar = Calendar.getInstance();
-                    calendar.setTime(diffList.get(i).getStartDate());
+                    LocalDate tempDate = diffList.get(i).getStartDate();
 
                     for (int j = 1; j < diffInDays; j++) {
-                        int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
-                        if (dayOfWeek == Calendar.FRIDAY) {
-                            diffList.get(i).setEndDate(calendar.getTime());
-                            calendar.add(Calendar.DATE, 3);
-                            ending.setStartDate(calendar.getTime());
+                        DayOfWeek dayOfWeek = diffList.get(i).getStartDate().getDayOfWeek();
+                        if (dayOfWeek == DayOfWeek.FRIDAY) {
+                            diffList.get(i).setEndDate(tempDate);
+                            tempDate = tempDate.plusDays(3);
+                            ending.setStartDate(tempDate);
                             diffList.add(i + 1, ending);
                             j = j + 3;
                         }
-                        calendar.add(Calendar.DATE, 1);
+                        tempDate = tempDate.plusDays(1);
                     }
                 }
             }
@@ -248,12 +222,11 @@ public class Adeies {
     static void populateMySchool(List<Adeia> adeiesMySchool, CSVReader csvReaderMySchool) throws IOException, CsvValidationException, ParseException {
         String[] nextRecord;
         int column;
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-        Date startDate = new Date();
-        Date endDate;
-        Date schoolYearStartDate;
-        schoolYearStartDate = dateFormat.parse("01/09/2023");
-        Calendar cal = Calendar.getInstance();
+        DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        LocalDate startDate = null;
+        LocalDate endDate;
+        LocalDate schoolYearStartDate = LocalDate.parse("01/09/2023", dateFormat);
+        LocalDate tempDate;
         boolean flag = false;
 
         while ((nextRecord = csvReaderMySchool.readNext()) != null) {
@@ -311,8 +284,8 @@ public class Adeies {
                         tempAdeia.setType(cell);
                     }
                     case 17 -> {
-                        startDate = dateFormat.parse(cell);
-                        if (startDate.before(schoolYearStartDate)) {
+                        startDate = LocalDate.parse(cell, dateFormat);
+                        if (startDate.isBefore(schoolYearStartDate)) {
                             flag = true;
                             break;
                         } else {
@@ -320,13 +293,13 @@ public class Adeies {
                         }
                     }
                     case 26 -> {
-                        cal.setTime(startDate);
+                        tempDate = startDate;
                         if ("ΑΔΕΙΑ ΠΑΤΡΟΤΗΤΑΣ".equals(tempAdeia.getType()) || ("ΑΔΕΙΑ ΚΑΝΟΝΙΚΗ".equals(tempAdeia.getType()))) {
-                            cal.add(Calendar.DATE, Integer.parseInt(cell) - 1 + weekendCount(tempAdeia.getStartDate(), Integer.parseInt(cell)));
+                            tempDate = tempDate.plusDays(Integer.parseInt(cell) - 1 + weekendCount(tempAdeia.getStartDate(), Integer.parseInt(cell)));
                         } else {
-                            cal.add(Calendar.DATE, Integer.parseInt(cell) - 1);
+                            tempDate = tempDate.plusDays(Integer.parseInt(cell) - 1);
                         }
-                        endDate = cal.getTime();
+                        endDate = tempDate;
                         tempAdeia.setEndDate(endDate);
                     }
                     default -> {
@@ -347,9 +320,9 @@ public class Adeies {
     private static void populateBGlossa(List<Adeia> adeiesBGlossa, CSVReader csvReaderBGlossa) throws IOException, CsvValidationException, ParseException, StringIndexOutOfBoundsException {
         String[] nextRecord;
         int column;
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-        Date startDate;
-        Date endDate;
+        DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        LocalDate startDate;
+        LocalDate endDate;
         boolean flag = false;
 
         while ((nextRecord = csvReaderBGlossa.readNext()) != null) {
@@ -391,11 +364,11 @@ public class Adeies {
                         tempAdeia.setType(cell);
                     }
                     case 6 -> {
-                        startDate = dateFormat.parse(cell);
+                        startDate = LocalDate.parse(cell, dateFormat);
                         tempAdeia.setStartDate(startDate);
                     }
                     case 7 -> {
-                        endDate = dateFormat.parse(cell);
+                        endDate = LocalDate.parse(cell, dateFormat);
                         tempAdeia.setEndDate(endDate);
                     }
                     default -> {

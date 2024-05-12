@@ -12,6 +12,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
 
 public class PrimaryController {
@@ -21,52 +22,56 @@ public class PrimaryController {
 
     @FXML
     private Button payrollButton;
-
     @FXML
     private Button mySchoolButton;
-
     @FXML
     private Button compareButton;
-    
     @FXML
     private Label errorLabel;
+    @FXML
+    private ImageView check1;
+    @FXML
+    private ImageView check2;
 
     @FXML
     private void payrollButtonClicked() throws IOException {
-        // App.setRoot("secondary");
-
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open Payroll CSV File");
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV", "*.csv"));
         payrollFile = fileChooser.showOpenDialog(payrollButton.getScene().getWindow());
-        if ((payrollFile != null) && (mySchoolFile != null)) {
-            compareButton.setDisable(false);
+        if (payrollFile != null) {
+            check1.setVisible(true);
+            if (mySchoolFile != null) {
+                compareButton.setDisable(false);
+            }
         }
     }
 
     @FXML
     private void mySchoolButtonClicked() throws IOException {
-
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open MySchool CSV File");
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV", "*.csv"));
         mySchoolFile = fileChooser.showOpenDialog(mySchoolButton.getScene().getWindow());
-        if ((payrollFile != null) && (mySchoolFile != null)) {
-            compareButton.setDisable(false);
+        if (mySchoolFile != null) {
+            check2.setVisible(true);
+            if (payrollFile != null) {
+                compareButton.setDisable(false);
+            }
         }
     }
 
     @FXML
     private void compareButtonClicked() throws IOException {
-
         try {
-            List <Adeia> diffs = Adeies.main(mySchoolFile.getCanonicalPath(), payrollFile.getCanonicalPath());
+            List<Adeia> diffs = Adeies.main(mySchoolFile.getCanonicalPath(), payrollFile.getCanonicalPath());
             FXMLLoader loader = new FXMLLoader(App.class.getResource("secondary.fxml"));
             Parent sec = loader.load();
             SecondaryController controller = (SecondaryController) loader.getController();
             controller.setTextToTextArea(diffs); // Call the method we wrote before
             App.getStage().setResizable(true);
             App.setRoot(sec);
+            App.getStage().centerOnScreen();
         } catch (FileNotFoundException | UnsupportedEncodingException | CsvValidationException | ParseException | StringIndexOutOfBoundsException ex) {
             ex.printStackTrace();
             errorLabel.setText("Επιλέχθηκαν λάθος αρχεία. Παρακαλώ ξαναπροσπαθήστε.");

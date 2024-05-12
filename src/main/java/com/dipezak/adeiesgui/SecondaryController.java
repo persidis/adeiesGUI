@@ -1,33 +1,32 @@
 package com.dipezak.adeiesgui;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
+import javafx.stage.FileChooser;
 
 public class SecondaryController implements Initializable {
 
+    private File saveFile;
     private List<Adeia> diffs;
-    private Text textHolder = new Text();
-    private double oldHeight = 0;
+
     @FXML
-    private VBox vBox;
-    @FXML
-    private Label secondaryLabel;
+    private Label resultLabel;
     @FXML
     private TableColumn<Adeia, String> columnAFM;
     @FXML
@@ -37,13 +36,11 @@ public class SecondaryController implements Initializable {
     @FXML
     private TableColumn<Adeia, String> columnType;
     @FXML
-    private TableColumn<Adeia, Date> columnStartDate;
+    private TableColumn<Adeia, LocalDate> columnStartDate;
     @FXML
-    private TableColumn<Adeia, Date> columnEndDate;
+    private TableColumn<Adeia, LocalDate> columnEndDate;
     @FXML
     private TableColumn<Adeia, String> columnFrom;
-    @FXML
-    private Button saveCSVButton;
     @FXML
     private TableView<Adeia> tableView;
 
@@ -54,14 +51,9 @@ public class SecondaryController implements Initializable {
     public void setDiffs(List<Adeia> diffs) {
         this.diffs = diffs;
     }
-    
-
-    @FXML
-    private void saveCSVButtonClicked() throws IOException {
-        App.setRoot("primary");
-    }
 
     public void setTextToTextArea(List<Adeia> adeies) {
+        setDiffs(adeies);
         columnAFM.setCellValueFactory(
                 new PropertyValueFactory<Adeia, String>("afm"));
         columnLastname.setCellValueFactory(
@@ -71,11 +63,11 @@ public class SecondaryController implements Initializable {
         columnType.setCellValueFactory(
                 new PropertyValueFactory<Adeia, String>("type"));
         columnStartDate.setCellFactory(column -> {
-            TableCell<Adeia, Date> cell = new TableCell<Adeia, Date>() {
-                private SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy");
+            TableCell<Adeia, LocalDate> cell = new TableCell<Adeia, LocalDate>() {
+                private final DateTimeFormatter format = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
                 @Override
-                protected void updateItem(Date item, boolean empty) {
+                protected void updateItem(LocalDate item, boolean empty) {
                     super.updateItem(item, empty);
                     if (empty) {
                         setText(null);
@@ -87,13 +79,13 @@ public class SecondaryController implements Initializable {
             return cell;
         });
         columnStartDate.setCellValueFactory(
-                new PropertyValueFactory<Adeia, Date>("startDate"));
+                new PropertyValueFactory<Adeia, LocalDate>("startDate"));
         columnEndDate.setCellFactory(column -> {
-            TableCell<Adeia, Date> cell = new TableCell<Adeia, Date>() {
-                private SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy");
+            TableCell<Adeia, LocalDate> cell = new TableCell<Adeia, LocalDate>() {
+                private final DateTimeFormatter format = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
                 @Override
-                protected void updateItem(Date item, boolean empty) {
+                protected void updateItem(LocalDate item, boolean empty) {
                     super.updateItem(item, empty);
                     if (empty) {
                         setText(null);
@@ -105,21 +97,49 @@ public class SecondaryController implements Initializable {
             return cell;
         });
         columnEndDate.setCellValueFactory(
-                new PropertyValueFactory<Adeia, Date>("endDate"));
+                new PropertyValueFactory<>("endDate"));
         columnFrom.setCellValueFactory(
-                new PropertyValueFactory<Adeia, String>("from"));
+                new PropertyValueFactory<>("from"));
         ObservableList<Adeia> data = FXCollections.observableArrayList(adeies);
-        App.getStage().setHeight(800);
-        App.getStage().setWidth(1000);
-        App.getStage().setMinHeight(tableView.getLayoutBounds().getHeight() +140);
+        PseudoClass highlighted = PseudoClass.getPseudoClass("highlighted");
+        tableView.setRowFactory(tableView2 -> {
+            TableRow<Adeia> row = new TableRow<>();
+            row.itemProperty().addListener((obs, oldAdeia, newAdeia) -> {
+                if (newAdeia != null) {
+                    row.pseudoClassStateChanged(highlighted, newAdeia.getFrom().equals("MySchool"));
+                }
+            });
+            return row;
+        });
         tableView.setItems(data);
-        // textHolder.textProperty().bind(tableView.textProperty());
-        //tableView.setPrefHeight(textHolder.getLayoutBounds().getHeight());
+
+        // Calculate preferred height of the TableView
+        double tableHeight = 30 * Math.min(15, adeies.size()) + 30; // Assuming 15+ rows visible by default, adjust as needed
+        App.getStage().setMinHeight(340);
+        App.getStage().setHeight(tableHeight + 100);
+        App.getStage().setWidth(1000);
+    }
+
+    @FXML
+    private void saveCSVButtonClicked() throws IOException {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Open Payroll CSV File");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV", "*.csv"));
+        saveFile = fileChooser.showSaveDialog(tableView.getScene().getWindow());
+        if (saveFile != null) {
+            boolean writeSuccess = Adeies.writeToFile(diffs, saveFile.getCanonicalPath());
+            if (writeSuccess) {
+                resultLabel.setText("Επιτυχία εγγραφής αρχείου .csv");
+                resultLabel.setVisible(true);
+            } else {
+                resultLabel.setText("Αποτυχία εγγραφής αρχείου .csv");
+                resultLabel.setVisible(true);
+            }
+        }
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        //secondaryLabel.setText("TESTINGGGG");
-        //throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+
     }
 }

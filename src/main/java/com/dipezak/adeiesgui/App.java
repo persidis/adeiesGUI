@@ -5,15 +5,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-
 import java.io.IOException;
-import javafx.beans.value.ChangeListener;
 
-/**
- * JavaFX App
- */
 public class App extends Application {
-
     private static Scene scene;
     private static Stage mainStage;
 
@@ -25,11 +19,6 @@ public class App extends Application {
         stage.setScene(scene);
         mainStage = stage;
         stage.show();
-        ChangeListener<Number> stageSizeListener = (observable, oldValue, newValue)
-                -> System.out.println("Height: " + stage.getHeight() + " Width: " + stage.getWidth());
-
-        stage.widthProperty().addListener(stageSizeListener);
-        stage.heightProperty().addListener(stageSizeListener);
     }
 
     static void setRoot(String fxml) throws IOException {
