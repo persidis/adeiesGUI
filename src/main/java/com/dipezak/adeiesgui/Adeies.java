@@ -5,49 +5,33 @@ import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.exceptions.CsvValidationException;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.PrintStream;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
+import java.util.*;
 import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.time.Period;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.time.format.DateTimeFormatter;
 
-/**
- *
- * @author user
- */
 public class Adeies {
 
     static CSVReader readCSVFile(String fileName, int skipLines) throws IOException {
-        FileReader filereader = new FileReader(fileName, Charset.forName("ISO-8859-7"));
+        FileReader fileReader = new FileReader(fileName, Charset.forName("ISO-8859-7"));
         CSVParser parser = new CSVParserBuilder()
                 .withSeparator(';')
                 .withIgnoreQuotations(true)
                 .build();
-        CSVReader csvReader = new CSVReaderBuilder(filereader)
+        return new CSVReaderBuilder(fileReader)
                 .withSkipLines(skipLines)
                 .withCSVParser(parser)
                 .build();
-        return csvReader;
     }
 
     static boolean writeToFile(List<Adeia> adeies, String filename) {
-        try {
-            String header = "ΑΦΜ;ΕΠΩΝΥΜΟ;ΟΝΟΜΑ;ΕΙΔΟΣ ΑΔΕΙΑΣ;ΕΝΑΡΞΗ;ΛΗΞΗ;ΑΠΟ ΣΥΣΤΗΜΑ\n";
-            FileOutputStream fileStream = new FileOutputStream(filename);
-            OutputStreamWriter file = new OutputStreamWriter(fileStream, "ISO-8859-7");
+        String header = "ΑΦΜ;ΕΠΩΝΥΜΟ;ΟΝΟΜΑ;ΕΙΔΟΣ ΑΔΕΙΑΣ;ΕΝΑΡΞΗ;ΛΗΞΗ;ΑΠΟ ΣΥΣΤΗΜΑ\n";
+        try (OutputStreamWriter file = new OutputStreamWriter(new FileOutputStream(filename), "ISO-8859-7")) {
             file.write(header);
             for (Adeia a : adeies) {
                 file.write(a.toCSVString());
@@ -61,30 +45,11 @@ public class Adeies {
     }
 
     static void order(List<Adeia> adeies) { // LastName + FirstName + startDate
-        Collections.sort(adeies, new Comparator() {
-            @Override
-            public int compare(Object o1, Object o2) {
-
-                String x1 = ((Adeia) o1).getLastName();
-                String x2 = ((Adeia) o2).getLastName();
-                int sComp = x1.compareTo(x2);
-                if (sComp != 0) {
-                    return sComp;
-                }
-
-                x1 = ((Adeia) o1).getFirstName();
-                x2 = ((Adeia) o2).getFirstName();
-                sComp = x1.compareTo(x2);
-                if (sComp != 0) {
-                    return sComp;
-                }
-
-                LocalDate d1 = ((Adeia) o1).getStartDate();
-                LocalDate d2 = ((Adeia) o2).getStartDate();
-                return d1.compareTo(d2);
+                adeies.sort(Comparator
+                        .comparing(Adeia::getLastName)
+                        .thenComparing(Adeia::getFirstName)
+                        .thenComparing(Adeia::getStartDate));
             }
-        });
-    }
 
     static int weekendCount(LocalDate startDate, LocalDate endDate) {
         long diffInDays = ChronoUnit.DAYS.between(startDate, endDate);
@@ -221,17 +186,13 @@ public class Adeies {
 
     static void populateMySchool(List<Adeia> adeiesMySchool, CSVReader csvReaderMySchool) throws IOException, CsvValidationException, ParseException {
         String[] nextRecord;
-        int column;
         DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        LocalDate startDate = null;
-        LocalDate endDate;
         LocalDate schoolYearStartDate = LocalDate.parse("01/09/2023", dateFormat);
-        LocalDate tempDate;
         boolean flag = false;
 
         while ((nextRecord = csvReaderMySchool.readNext()) != null) {
             Adeia tempAdeia = new Adeia();
-            column = 1;
+            int column = 1;
             for (String cell : nextRecord) {
                 if (flag) {
                     flag = false;
@@ -284,7 +245,7 @@ public class Adeies {
                         tempAdeia.setType(cell);
                     }
                     case 17 -> {
-                        startDate = LocalDate.parse(cell, dateFormat);
+                        LocalDate startDate = LocalDate.parse(cell, dateFormat);
                         if (startDate.isBefore(schoolYearStartDate)) {
                             flag = true;
                             break;
@@ -293,20 +254,16 @@ public class Adeies {
                         }
                     }
                     case 26 -> {
-                        tempDate = startDate;
-                        if ("ΑΔΕΙΑ ΠΑΤΡΟΤΗΤΑΣ".equals(tempAdeia.getType()) || ("ΑΔΕΙΑ ΚΑΝΟΝΙΚΗ".equals(tempAdeia.getType()))) {
-                            tempDate = tempDate.plusDays(Integer.parseInt(cell) - 1 + weekendCount(tempAdeia.getStartDate(), Integer.parseInt(cell)));
-                        } else {
-                            tempDate = tempDate.plusDays(Integer.parseInt(cell) - 1);
+                        LocalDate endDate = tempAdeia.getStartDate().plusDays(Integer.parseInt(cell) - 1);
+                        if ("ΑΔΕΙΑ ΠΑΤΡΟΤΗΤΑΣ".equals(tempAdeia.getType()) || "ΑΔΕΙΑ ΚΑΝΟΝΙΚΗ".equals(tempAdeia.getType())) {
+                            endDate = endDate.plusDays(weekendCount(tempAdeia.getStartDate(), endDate));
                         }
-                        endDate = tempDate;
                         tempAdeia.setEndDate(endDate);
                     }
                     default -> {
                     }
                 }
                 column++;
-                //out.print(cell + "\t");
             }
             // Αν είναι αναπληρωτής + δεν ανακλήθηκε + δεν είναι πριν από αρχή σχολ. χρονιάς ++
             //      if ((tempAdeia.getAfm() != null) && (tempAdeia.getStatus() != null) &&  (!"5-Ανακλήθηκε".equals(tempAdeia.getStatus() )) && (tempAdeia.getStartDate() != null)) {

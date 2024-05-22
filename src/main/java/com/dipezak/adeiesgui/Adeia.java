@@ -1,156 +1,142 @@
 package com.dipezak.adeiesgui;
 
-import java.text.ParseException;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 /**
- *
- * @author user
+ * Author: user
  */
 public class Adeia {
-    private String afm;
-    private String lastName;
-    private String firstName;
-    private String type; // Αιμοδοτική, ΑΝΑΡΡΩΤΙΚΗ - με Ιατρική Γνωμάτευση, Κανονική, Για ετήσιο γυναικολογικό έλεγχο, Ασθένειας τέκνου ktl
-    private LocalDate startDate;
-    private LocalDate endDate; 
-    private String from;
-    
+    private final StringProperty afm = new SimpleStringProperty(this, "afm", "");
+    private final StringProperty lastName = new SimpleStringProperty(this, "lastName", "");
+    private final StringProperty firstName = new SimpleStringProperty(this, "firstName", "");
+    private final StringProperty type = new SimpleStringProperty(this, "type", "");
+    private final ObjectProperty<LocalDate> startDate = new SimpleObjectProperty<>(this, "startDate");
+    private final ObjectProperty<LocalDate> endDate = new SimpleObjectProperty<>(this, "endDate");
+    private final StringProperty from = new SimpleStringProperty(this, "from", "");
+
     private String matchType(String type) {
-        switch (type) {
-            case "Αιμοδοτική" -> {
-                        return "ΑΔΕΙΑ ΑΙΜΟΔΟΣΙΑΣ/ΑΙΜΟΛΗΨΙΑΣ";
-                    }
-            case "Αιμοληψίας (σε εργάσιμη ημέρα)" -> {
-                return "ΑΔΕΙΑ ΑΙΜΟΔΟΣΙΑΣ/ΑΙΜΟΛΗΨΙΑΣ";
-            }
-            case "ΑΝΑΡΡΩΤΙΚΗ - με Ιατρική Γνωμάτευση" -> {
-                return "ΑΔΕΙΑ ΑΣΘΕΝΕΙΑΣ";
-            }
-            case "ΑΝΑΡΡΩΤΙΚΗ - με Υπεύθυνη Δήλωση" -> {
-                return "ΑΔΕΙΑ ΑΣΘΕΝΕΙΑΣ";
-            }
-            case "ΑΝΑΡΡΩΤΙΚΗ - με Γνωμάτευση Νοσοκομείου (ν.3528/2007 άρ.56, παρ.3)" -> {
-                return "ΑΔΕΙΑ ΑΣΘΕΝΕΙΑΣ";
-            }
-            case "Ανατροφής παιδιού (με πλήρεις αποδοχές)" -> {
-                return "ΑΔΕΙΑ ΑΝΑΤΡΟΦΗΣ ΤΕΚΝΟΥ ΤΡΙΜΗΝΗ (Ν. 4599/2019)";
-            }
-            case "Ασθένειας τέκνου" -> {
-                return "ΑΔΕΙΑ ΑΣΘΕΝΕΙΑΣ ΤΕΚΝΟΥ";
-            }
-            case "Γάμου" -> {
-                return "ΑΔΕΙΑ ΓΑΜΟΥ/ΣΥΜΦΩΝΟΥ ΣΥΜΒΙΩΣΗΣ";
-            }
-            case "Για επιμορφωτικούς ή επιστημονικούς λόγους" -> {
-                return "ΑΔΕΙΑ ΓΙΑ ΕΠΙΣΤΗΜΟΝΙΚΟΥΣ ΚΑΙ ΕΠΙΜΟΡΦΩΤΙΚΟΥΣ ΛΟΓΟΥΣ";
-            }
-            case "Για ετήσιο γυναικολογικό έλεγχο" -> {
-                return "ΑΔΕΙΑ ΕΤΗΣΙΟΥ ΓΥΝΑΙΚΟΛΟΓΙΚΟΥ ΕΛΕΓΧΟΥ";
-            }
-            case "Ειδική λόγω Αναπηρίας" -> {
-                return "ΑΔΕΙΑ ΑΝΑΠΗΡΙΑΣ ΕΙΔΙΚΗ";
-            }
-            case "Εκλογική" -> {
-                return "ΑΔΕΙΑ ΕΚΛΟΓΙΚΗ ΕΙΔΙΚΗ";
-            }
-            case "Εξετάσεων" -> {
-                return "ΑΔΕΙΑ ΕΞΕΤΑΣΕΩΝ (μαθητές, σπουδαστές ή φοιτητές)";
-            }
-            case "Θανάτου (συζύγου ή συγγενούς έως και β βαθμού)" -> {
-                return "ΑΔΕΙΑ ΘΑΝΑΤΟΥ ΣΥΓΓΕΝΟΥΣ";
-            }
-            case "Κανονική" -> {
-                return "ΑΔΕΙΑ ΚΑΝΟΝΙΚΗ";
-            }
-            case "ΜΗΤΡΟΤΗΤΑΣ - Κύησης" -> {
-                return "ΑΔΕΙΑ ΚΥΗΣΗΣ";
-            }
-            case "ΜΗΤΡΟΤΗΤΑΣ - Λοχείας" -> {
-                return "ΑΔΕΙΑ ΛΟΧΕΙΑΣ";
-            }
-            case "ΜΗΤΡΟΤΗΤΑΣ - Προγεννητικού Ελέγχου" -> {
-                return "ΑΔΕΙΑ ΠΡΟΓΕΝΝΗΤΙΚΩΝ ΕΞΕΤΑΣΕΩΝ";
-            }
-            case "Παρακολούθησης σχολικής επίδοσης τέκνου" -> {
-                return "ΑΔΕΙΑ ΠΑΡΑΚΟΛΟΥΘΗΣΗΣ ΣΧΟΛΙΚΗΣ ΕΠΙΔΟΣΗΣ ΤΕΚΝΩΝ";
-            }
-            case "Πατρότητας" -> {
-                return "ΑΔΕΙΑ ΠΑΤΡΟΤΗΤΑΣ";
-            }
-            default -> {
-                return type;
-            }
-        }
+        return switch (type) {
+            case "Αιμοδοτική", "Αιμοληψίας (σε εργάσιμη ημέρα)" -> "ΑΔΕΙΑ ΑΙΜΟΔΟΣΙΑΣ/ΑΙΜΟΛΗΨΙΑΣ";
+            case "ΑΝΑΡΡΩΤΙΚΗ - με Ιατρική Γνωμάτευση", "ΑΝΑΡΡΩΤΙΚΗ - με Υπεύθυνη Δήλωση", "ΑΝΑΡΡΩΤΙΚΗ - με Γνωμάτευση Νοσοκομείου (ν.3528/2007 άρ.56, παρ.3)" -> "ΑΔΕΙΑ ΑΣΘΕΝΕΙΑΣ";
+            case "Ανατροφής παιδιού (με πλήρεις αποδοχές)" -> "ΑΔΕΙΑ ΑΝΑΤΡΟΦΗΣ ΤΕΚΝΟΥ ΤΡΙΜΗΝΗ (Ν. 4599/2019)";
+            case "Ασθένειας τέκνου" -> "ΑΔΕΙΑ ΑΣΘΕΝΕΙΑΣ ΤΕΚΝΟΥ";
+            case "Γάμου" -> "ΑΔΕΙΑ ΓΑΜΟΥ/ΣΥΜΦΩΝΟΥ ΣΥΜΒΙΩΣΗΣ";
+            case "Για επιμορφωτικούς ή επιστημονικούς λόγους" -> "ΑΔΕΙΑ ΓΙΑ ΕΠΙΣΤΗΜΟΝΙΚΟΥΣ ΚΑΙ ΕΠΙΜΟΡΦΩΤΙΚΟΥΣ ΛΟΓΟΥΣ";
+            case "Για ετήσιο γυναικολογικό έλεγχο" -> "ΑΔΕΙΑ ΕΤΗΣΙΟΥ ΓΥΝΑΙΚΟΛΟΓΙΚΟΥ ΕΛΕΓΧΟΥ";
+            case "Ειδική λόγω Αναπηρίας" -> "ΑΔΕΙΑ ΑΝΑΠΗΡΙΑΣ ΕΙΔΙΚΗ";
+            case "Εκλογική" -> "ΑΔΕΙΑ ΕΚΛΟΓΙΚΗ ΕΙΔΙΚΗ";
+            case "Εξετάσεων" -> "ΑΔΕΙΑ ΕΞΕΤΑΣΕΩΝ (μαθητές, σπουδαστές ή φοιτητές)";
+            case "Θανάτου (συζύγου ή συγγενούς έως και β βαθμού)" -> "ΑΔΕΙΑ ΘΑΝΑΤΟΥ ΣΥΓΓΕΝΟΥΣ";
+            case "Κανονική" -> "ΑΔΕΙΑ ΚΑΝΟΝΙΚΗ";
+            case "ΜΗΤΡΟΤΗΤΑΣ - Κύησης" -> "ΑΔΕΙΑ ΚΥΗΣΗΣ";
+            case "ΜΗΤΡΟΤΗΤΑΣ - Λοχείας" -> "ΑΔΕΙΑ ΛΟΧΕΙΑΣ";
+            case "ΜΗΤΡΟΤΗΤΑΣ - Προγεννητικού Ελέγχου" -> "ΑΔΕΙΑ ΠΡΟΓΕΝΝΗΤΙΚΩΝ ΕΞΕΤΑΣΕΩΝ";
+            case "Παρακολούθησης σχολικής επίδοσης τέκνου" -> "ΑΔΕΙΑ ΠΑΡΑΚΟΛΟΥΘΗΣΗΣ ΣΧΟΛΙΚΗΣ ΕΠΙΔΟΣΗΣ ΤΕΚΝΩΝ";
+            case "Πατρότητας" -> "ΑΔΕΙΑ ΠΑΤΡΟΤΗΤΑΣ";
+            default -> type;
+        };
     }
 
+    // Getters and setters using StringProperty and ObjectProperty
     public String getAfm() {
-        return afm;
+        return afm.get();
     }
 
     public void setAfm(String afm) {
-        this.afm = afm;
+        this.afm.set(afm);
+    }
+
+    public StringProperty afmProperty() {
+        return afm;
     }
 
     public String getLastName() {
-        return lastName;
+        return lastName.get();
     }
 
     public void setLastName(String lastName) {
-        this.lastName = lastName;
+        this.lastName.set(lastName);
+    }
+
+    public StringProperty lastNameProperty() {
+        return lastName;
     }
 
     public String getFirstName() {
-        return firstName;
+        return firstName.get();
     }
 
     public void setFirstName(String firstName) {
-        this.firstName = firstName;
+        this.firstName.set(firstName);
+    }
+
+    public StringProperty firstNameProperty() {
+        return firstName;
     }
 
     public String getType() {
-        return type;
+        return type.get();
     }
 
     public void setType(String type) {
-        this.type = matchType(type);
+        this.type.set(matchType(type));
+    }
+
+    public StringProperty typeProperty() {
+        return type;
     }
 
     public LocalDate getStartDate() {
+        return startDate.get();
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        this.startDate.set(startDate);
+    }
+
+    public ObjectProperty<LocalDate> startDateProperty() {
         return startDate;
     }
 
-    public void setStartDate(LocalDate startDate) throws ParseException {
-         this.startDate = startDate;
+    public LocalDate getEndDate() {
+        return endDate.get();
     }
 
-    public LocalDate getEndDate() {
+    public void setEndDate(LocalDate endDate) {
+        this.endDate.set(endDate);
+    }
+
+    public ObjectProperty<LocalDate> endDateProperty() {
         return endDate;
     }
 
-    public void setEndDate(LocalDate endDate) throws ParseException {
-        this.endDate = endDate;
-    }
-
     public String getFrom() {
-        return from;
+        return from.get();
     }
 
     public void setFrom(String from) {
-        this.from = from;
+        this.from.set(from);
     }
-    
-    
+
+    public StringProperty fromProperty() {
+        return from;
+    }
 
     @Override
     public String toString() {
         DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        return "afm=" + afm + "\t lastName=" + lastName + "\t firstName=" + firstName + 
-                "\t type=" + type + "\t startDate=" + dateFormat.format(startDate) + "\t endDate=" + dateFormat.format(endDate) + '\n';
-    }   
- 
+        return "afm=" + getAfm() + "\t lastName=" + getLastName() + "\t firstName=" + getFirstName() +
+                "\t type=" + getType() + "\t startDate=" + (getStartDate() != null ? dateFormat.format(getStartDate()) : "null") +
+                "\t endDate=" + (getEndDate() != null ? dateFormat.format(getEndDate()) : "null") + '\n';
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -160,60 +146,42 @@ public class Adeia {
             return false;
         }
         Adeia that = (Adeia) o;
-        return afm.equals(that.afm)
-                && lastName.equals(that.lastName)
-                && firstName.equals(that.firstName)
-                && type.equals(that.type)
-                && startDate.equals(that.startDate)
-                && endDate.equals(that.endDate);
+        return Objects.equals(getAfm(), that.getAfm()) &&
+               Objects.equals(getLastName(), that.getLastName()) &&
+               Objects.equals(getFirstName(), that.getFirstName()) &&
+               Objects.equals(getType(), that.getType()) &&
+               Objects.equals(getStartDate(), that.getStartDate()) &&
+               Objects.equals(getEndDate(), that.getEndDate());
     }
 
     @Override
     public int hashCode() {
-        int hash = 5;
-        hash = 13 * hash + Objects.hashCode(this.afm);
-        hash = 13 * hash + Objects.hashCode(this.lastName);
-        hash = 13 * hash + Objects.hashCode(this.firstName);
-        hash = 13 * hash + Objects.hashCode(this.type);
-        hash = 13 * hash + Objects.hashCode(this.startDate);
-        hash = 13 * hash + Objects.hashCode(this.endDate);
-        return hash;
+        return Objects.hash(getAfm(), getLastName(), getFirstName(), getType(), getStartDate(), getEndDate());
     }
 
     public String toCSVString() {
         DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        return "\'" + afm + "\';" + lastName + ";" + firstName + ";" + type + ";" + 
-                dateFormat.format(startDate) + ";" + dateFormat.format(endDate) +
-                ";" + from + '\n';
+        return "\'" + getAfm() + "\';" + getLastName() + ";" + getFirstName() + ";" + getType() + ";" +
+                (getStartDate() != null ? dateFormat.format(getStartDate()) : "") + ";" +
+                (getEndDate() != null ? dateFormat.format(getEndDate()) : "") + ";" +
+                getFrom() + '\n';
     }
-    
+
     public Adeia() {
-        this.afm = null;
-        this.lastName = null;
-        this.firstName = null;
-        this.type = null;
-        this.startDate = null;
-        this.endDate = null;
-        this.from = null;
+        this("", "", "", "", null, null, "");
     }
-    
+
     public Adeia(Adeia a) {
-        this.afm = a.getAfm();
-        this.lastName = a.getLastName();
-        this.firstName = a.getFirstName();
-        this.type = a.getType();
-        this.startDate = a.getStartDate();
-        this.endDate = a.getEndDate();
-        this.from = a.getFrom();
+        this(a.getAfm(), a.getLastName(), a.getFirstName(), a.getType(), a.getStartDate(), a.getEndDate(), a.getFrom());
     }
-    
-    public Adeia(String afm, String lastName, String firstName, String type, String status, LocalDate startDate, LocalDate endDate, String from) {
-        this.afm = afm;
-        this.lastName = lastName;
-        this.firstName = firstName;
-        this.type = type;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.from = from;
-    }    
+
+    public Adeia(String afm, String lastName, String firstName, String type, LocalDate startDate, LocalDate endDate, String from) {
+        setAfm(afm);
+        setLastName(lastName);
+        setFirstName(firstName);
+        setType(type);
+        setStartDate(startDate);
+        setEndDate(endDate);
+        setFrom(from);
+    }
 }
