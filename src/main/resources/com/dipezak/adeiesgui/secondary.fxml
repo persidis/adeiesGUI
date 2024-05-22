@@ -3,6 +3,7 @@
 <?import java.net.URL?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
@@ -25,6 +26,7 @@
         </TableView>
         <Button fx:id="saveCSVButton" onAction="#saveCSVButtonClicked" styleClass="button-glass-grey" text="Save CSV" />
       <Label fx:id="resultLabel" stylesheets="@style.css" text="Επιτυχής εγγραφή αρχείου .csv" visible="false" />
+      <CheckBox fx:id="checkBox" mnemonicParsing="false" selected="true" stylesheets="@style.css" text="Εμφάνιση απουσιών" />
     </children>
     <padding>
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
