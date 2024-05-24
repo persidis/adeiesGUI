@@ -25,7 +25,8 @@ import javafx.stage.FileChooser;
 public class SecondaryController implements Initializable {
 
     private File saveFile;
-    private List<Adeia> diffs;
+    private ObservableList<Adeia> removedAdeies;
+    private ObservableList<Adeia> data;
 
     @FXML
     private Label resultLabel;
@@ -48,17 +49,59 @@ public class SecondaryController implements Initializable {
     @FXML
     private TableView<Adeia> tableView;
 
-    public List<Adeia> getDiffs() {
-        return diffs;
+    public SecondaryController() {
+        this.removedAdeies = FXCollections.observableArrayList();
+        this.data = FXCollections.observableArrayList();
     }
 
-    public void setDiffs(List<Adeia> diffs) {
-        this.diffs = diffs;
+    public ObservableList<Adeia> getData() {
+        return data;
+    }
+
+    public void setData(ObservableList<Adeia> data) {
+        this.data = data;
     }
 
     public void setTextToTextArea(List<Adeia> adeies) {
-        setDiffs(adeies);
-        checkBox.selectedProperty().addListener((obs, wasSelected, isNowSelected) -> tableView.refresh());
+        setData(FXCollections.observableArrayList(adeies));
+        //columnLastname.setSortType(TableColumn.SortType.ASCENDING);
+        //tableView.getSortOrder().add(columnLastname);
+        tableView.setItems(data);
+        tableView.sort();
+
+        // Calculate preferred height of the TableView
+        double tableHeight = 30 * Math.min(15, data.size()) + 30; // Assuming 15+ rows visible by default, adjust as needed
+        App.getStage().setMinHeight(340);
+        App.getStage().setHeight(tableHeight + 100);
+        App.getStage().setWidth(1000);
+    }
+
+    @FXML
+    private void saveCSVButtonClicked() throws IOException {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Open Payroll CSV File");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV", "*.csv"));
+        saveFile = fileChooser.showSaveDialog(tableView.getScene().getWindow());
+        if (saveFile != null) {
+            boolean writeSuccess = Adeies.writeToFile(data, saveFile.getCanonicalPath());
+            if (writeSuccess) {
+                resultLabel.setText("Επιτυχία εγγραφής αρχείου .csv");
+                resultLabel.setVisible(true);
+            } else {
+                resultLabel.setText("Αποτυχία εγγραφής αρχείου .csv");
+                resultLabel.setVisible(true);
+            }
+        }
+    }
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        data.addListener(new ListChangeListener<Adeia>() {
+            @Override
+            public void onChanged(ListChangeListener.Change<? extends Adeia> c) {
+                tableView.refresh();
+            }
+        });
         columnAFM.setCellValueFactory(
                 new PropertyValueFactory<Adeia, String>("afm"));
         columnLastname.setCellValueFactory(
@@ -105,15 +148,16 @@ public class SecondaryController implements Initializable {
                 new PropertyValueFactory<>("endDate"));
         columnFrom.setCellValueFactory(
                 new PropertyValueFactory<>("from"));
-        ObservableList<Adeia> data = FXCollections.observableArrayList(adeies);
-        data.addListener(new ListChangeListener<Adeia>() {
-  @Override
-  public void onChanged(Change<? extends Adeia> c) {
-    tableView.refresh();
-  }
-});
-        PseudoClass highlighted = PseudoClass.getPseudoClass("highlighted");
-        
+
+        checkBox.selectedProperty().addListener((obs, wasSelected, isNowSelected) -> {
+            if (isNowSelected && removedAdeies != null && !removedAdeies.isEmpty()) {
+                data.addAll(removedAdeies);
+                removedAdeies.clear();
+            }
+            tableView.sort();
+            tableView.refresh();
+        });
+
         tableView.setRowFactory(tableView2 -> {
             TableRow<Adeia> row = new TableRow<>() {
                 @Override
@@ -124,50 +168,19 @@ public class SecondaryController implements Initializable {
                     } else {
                         boolean shouldDisable = !checkBox.isSelected() && "Απουσία".equals(adeia.getType());
                         if (shouldDisable) {
+                            removedAdeies.add(adeia);
                             data.remove(adeia);
                         }
-                        setDisable(shouldDisable);
-                        setVisible(shouldDisable);
-                        setStyle(shouldDisable ? "-fx-background-color: lightgray;" : "");
                     }
                 }
             };
             row.itemProperty().addListener((obs, oldAdeia, newAdeia) -> {
                 if (newAdeia != null) {
-                    row.pseudoClassStateChanged(highlighted, newAdeia.getFrom().equals("MySchool"));
+                    row.pseudoClassStateChanged(PseudoClass.getPseudoClass("highlighted"), newAdeia.getFrom().equals("MySchool"));
                 }
             });
+            tableView.refresh();
             return row;
         });
-        tableView.setItems(data);
-
-        // Calculate preferred height of the TableView
-        double tableHeight = 30 * Math.min(15, adeies.size()) + 30; // Assuming 15+ rows visible by default, adjust as needed
-        App.getStage().setMinHeight(340);
-        App.getStage().setHeight(tableHeight + 100);
-        App.getStage().setWidth(1000);
-    }
-
-    @FXML
-    private void saveCSVButtonClicked() throws IOException {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Open Payroll CSV File");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV", "*.csv"));
-        saveFile = fileChooser.showSaveDialog(tableView.getScene().getWindow());
-        if (saveFile != null) {
-            boolean writeSuccess = Adeies.writeToFile(diffs, saveFile.getCanonicalPath());
-            if (writeSuccess) {
-                resultLabel.setText("Επιτυχία εγγραφής αρχείου .csv");
-                resultLabel.setVisible(true);
-            } else {
-                resultLabel.setText("Αποτυχία εγγραφής αρχείου .csv");
-                resultLabel.setVisible(true);
-            }
-        }
-    }
-
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-
     }
 }
