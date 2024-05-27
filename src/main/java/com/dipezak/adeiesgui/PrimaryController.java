@@ -68,7 +68,7 @@ public class PrimaryController {
             FXMLLoader loader = new FXMLLoader(App.class.getResource("secondary.fxml"));
             Parent sec = loader.load();
             SecondaryController controller = (SecondaryController) loader.getController();
-            controller.setTextToTextArea(diffs); // Call the method we wrote before
+            controller.setData(diffs); // Call the method we wrote before
             App.getStage().setResizable(true);
             App.setRoot(sec);
             App.getStage().centerOnScreen();

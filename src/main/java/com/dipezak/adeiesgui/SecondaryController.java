@@ -10,6 +10,7 @@ import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.SortedList;
 import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -27,6 +28,7 @@ public class SecondaryController implements Initializable {
     private File saveFile;
     private ObservableList<Adeia> removedAdeies;
     private ObservableList<Adeia> data;
+    private SortedList<Adeia> sortedData;
 
     @FXML
     private Label resultLabel;
@@ -54,26 +56,27 @@ public class SecondaryController implements Initializable {
         this.data = FXCollections.observableArrayList();
     }
 
-    public ObservableList<Adeia> getData() {
-        return data;
+    public void setData(List<Adeia> adeies) {
+        data = FXCollections.observableArrayList(adeies);
+        data.addListener(new ListChangeListener<Adeia>() {
+            @Override
+            public void onChanged(ListChangeListener.Change<? extends Adeia> c) {
+                setTableHeight();
+                tableView.refresh();
+            }
+        });
+        sortedData = new SortedList<>(data);
+        // this ensures the sortedData is sorted according to the sort columns in the table:
+        sortedData.comparatorProperty().bind(tableView.comparatorProperty());
+        tableView.setItems(sortedData);
+        // programmatically set a sort column:
+        tableView.getSortOrder().addAll(columnLastname, columnStartDate);
+        setTableHeight();
     }
-
-    public void setData(ObservableList<Adeia> data) {
-        this.data = data;
-    }
-
-    public void setTextToTextArea(List<Adeia> adeies) {
-        setData(FXCollections.observableArrayList(adeies));
-        //columnLastname.setSortType(TableColumn.SortType.ASCENDING);
-        //tableView.getSortOrder().add(columnLastname);
-        tableView.setItems(data);
-        tableView.sort();
-
-        // Calculate preferred height of the TableView
-        double tableHeight = 30 * Math.min(15, data.size()) + 30; // Assuming 15+ rows visible by default, adjust as needed
-        App.getStage().setMinHeight(340);
-        App.getStage().setHeight(tableHeight + 100);
-        App.getStage().setWidth(1000);
+    
+    private void setTableHeight() {
+        // Assuming 15+ rows visible by default, adjust as needed
+        App.getStage().setHeight(30 * Math.min(15, data.size()) + 130);
     }
 
     @FXML
@@ -96,12 +99,9 @@ public class SecondaryController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        data.addListener(new ListChangeListener<Adeia>() {
-            @Override
-            public void onChanged(ListChangeListener.Change<? extends Adeia> c) {
-                tableView.refresh();
-            }
-        });
+        // Set initial tableHeight
+        App.getStage().setMinHeight(340);
+        App.getStage().setWidth(1000);
         columnAFM.setCellValueFactory(
                 new PropertyValueFactory<Adeia, String>("afm"));
         columnLastname.setCellValueFactory(
