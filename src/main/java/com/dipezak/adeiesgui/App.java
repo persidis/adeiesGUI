@@ -16,7 +16,7 @@ public class App extends Application {
         scene = new Scene(loadFXML("primary"), 380, 240);
         stage.setResizable(false);
         stage.setTitle("Σύγκριση αδειών Payroll και Myschool");
-        stage.setScene(scene);
+        stage.setScene(scene);       
         mainStage = stage;
         stage.show();
     }
