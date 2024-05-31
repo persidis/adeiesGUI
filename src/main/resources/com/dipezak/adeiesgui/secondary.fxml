@@ -10,7 +10,7 @@
 <?import org.controlsfx.control.CheckComboBox?>
 <?scenebuilder-stylesheet style.css?>
 
-<VBox fx:id="vBox" alignment="CENTER" minHeight="600" prefHeight="600.0" prefWidth="1006.0" spacing="20.0" styleClass="shadow-pane" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.dipezak.adeiesgui.SecondaryController">
+<VBox fx:id="vBox" alignment="CENTER" minHeight="650" prefHeight="650.0" prefWidth="1006.0" spacing="20.0" styleClass="shadow-pane" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.dipezak.adeiesgui.SecondaryController">
     <children>
         <Label fx:id="secondaryLabel" minWidth="100" stylesheets="@style.css" text="Διαφορές μεταξύ των δύο αρχείων" VBox.vgrow="ALWAYS" />
         <TableView fx:id="tableView" maxHeight="1000" maxWidth="1000" minHeight="200" minWidth="200" stylesheets="@style.css" VBox.vgrow="ALWAYS">
@@ -24,8 +24,8 @@
                 <TableColumn fx:id="columnFrom" maxWidth="125.0" minWidth="125.0" prefWidth="125.0" resizable="false" text="ΑΠΟ ΣΥΣΤΗΜΑ" />
             </columns>
         </TableView>
-        <Button fx:id="saveCSVButton" onAction="#saveCSVButtonClicked" styleClass="button-glass-grey" text="Save CSV" />
-      <CheckComboBox fx:id="checkComboBox" minHeight="-Infinity" minWidth="-Infinity" prefWidth="230.0" />
+        <CheckComboBox fx:id="checkComboBox" minHeight="-Infinity" minWidth="-Infinity" prefWidth="230.0" />
+        <Button fx:id="saveCSVButton" onAction="#saveCSVButtonClicked" styleClass="button-glass-grey" text="Αποθήκευση σε CSV" />
         <Label fx:id="resultLabel" stylesheets="@style.css" text="Επιτυχής εγγραφή αρχείου .csv" visible="false" />
     </children>
     <padding>

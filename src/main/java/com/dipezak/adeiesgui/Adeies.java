@@ -239,7 +239,6 @@ public class Adeies {
                             flag = true;
                             break;
                         }
-                        // tempAdeia.setStatus(cell);
                     }
                     case 16 -> {
                         tempAdeia.setType(cell);
@@ -266,7 +265,6 @@ public class Adeies {
                 column++;
             }
             // Αν είναι αναπληρωτής + δεν ανακλήθηκε + δεν είναι πριν από αρχή σχολ. χρονιάς ++
-            //      if ((tempAdeia.getAfm() != null) && (tempAdeia.getStatus() != null) &&  (!"5-Ανακλήθηκε".equals(tempAdeia.getStatus() )) && (tempAdeia.getStartDate() != null)) {
             if (tempAdeia.getStartDate() != null) {
                 tempAdeia.setFrom("MySchool");
                 adeiesMySchool.add(tempAdeia);
