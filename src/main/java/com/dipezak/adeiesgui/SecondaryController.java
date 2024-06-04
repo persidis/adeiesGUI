@@ -129,6 +129,7 @@ public class SecondaryController implements Initializable {
 
      private void setupCheckComboBox() {
         setTypesWithoutDuplicates();
+        checkComboBox.getItems().add("Επιλογή / απεπιλογή όλων");
         checkComboBox.getItems().addAll(getTypesWithoutDuplicates());
         checkComboBox.setShowCheckedCount(true);
         checkComboBox.getCheckModel().checkAll();
@@ -149,9 +150,19 @@ public class SecondaryController implements Initializable {
         });
 
         checkComboBox.getCheckModel().getCheckedItems().addListener((ListChangeListener<String>) c -> {
+            boolean changing = false;
             while (c.next()) {
                 if (c.wasAdded()) {
                     String addedType = c.getAddedSubList().get(0);
+                    if (!changing && addedType.equals("Επιλογή / απεπιλογή όλων")) {
+                        changing = true;
+                        for (int i = 1; i < checkComboBox.getCheckModel().getItemCount(); i++) {
+                            if (!checkComboBox.getCheckModel().isChecked(i)) {
+                                checkComboBox.getCheckModel().check(i);
+                            }
+                        }
+                        changing = false;
+                    }
                     Iterator<Adeia> iterator = removedAdeies.iterator();
                     while (iterator.hasNext()) {
                         Adeia adeia = iterator.next();
@@ -159,6 +170,14 @@ public class SecondaryController implements Initializable {
                             data.add(adeia);
                             iterator.remove();
                         }
+                    }
+                }
+                else if (c.wasRemoved()) {
+                    String addedType = c.getRemoved().get(0);
+                    if (!changing && addedType.equals("Επιλογή / απεπιλογή όλων")) {
+                        changing = true;
+                        checkComboBox.getCheckModel().clearChecks();
+                        changing = false;
                     }
                 }
             }

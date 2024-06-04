@@ -51,16 +51,17 @@ public class Adeies {
                         .thenComparing(Adeia::getStartDate));
             }
 
-    static int weekendCount(LocalDate startDate, LocalDate endDate) {
-        long diffInDays = ChronoUnit.DAYS.between(startDate, endDate);
+    static int weekendCount(LocalDate startLocalDate, LocalDate endLocalDate) {
+        long diffInDays = ChronoUnit.DAYS.between(startLocalDate, endLocalDate);
+        System.out.println("\\n startDate: " + startLocalDate.toString() + "  endDate: " + endLocalDate.toString() + "  diff: " + String.valueOf(diffInDays));
         int cnt = 0;
-        for (int i = 1; i <= diffInDays; i++) {
-            DayOfWeek dayOfWeek = startDate.getDayOfWeek();
+        for (int i = 0; i <= diffInDays; i++) {
+            DayOfWeek dayOfWeek = startLocalDate.getDayOfWeek();
             if (dayOfWeek == DayOfWeek.SATURDAY) { // Το ΣΚ πάει πακέτο!
                 cnt++;
                 cnt++;
             }
-            startDate = startDate.plusDays(1);
+            startLocalDate = startLocalDate.plusDays(1);
         }
         return cnt;
     }
@@ -168,7 +169,7 @@ public class Adeies {
                     LocalDate tempDate = diffList.get(i).getStartDate();
 
                     for (int j = 1; j < diffInDays; j++) {
-                        DayOfWeek dayOfWeek = diffList.get(i).getStartDate().getDayOfWeek();
+                        DayOfWeek dayOfWeek = tempDate.getDayOfWeek();
                         if (dayOfWeek == DayOfWeek.FRIDAY) {
                             diffList.get(i).setEndDate(tempDate);
                             tempDate = tempDate.plusDays(3);
@@ -339,11 +340,9 @@ public class Adeies {
     }
 
     public static List<Adeia> main(String s1, String s2) throws FileNotFoundException, UnsupportedEncodingException, IOException, CsvValidationException, ParseException {
-        PrintStream out = new PrintStream(System.out, true, "UTF-8");
+        // PrintStream out = new PrintStream(System.out, true, "UTF-8");
         List<Adeia> adeiesMySchool = new ArrayList<>();
         List<Adeia> adeiesBGlossa = new ArrayList<>();
-        //CSVReader csvReaderMySchool = readCSVFile("fromMySchool.csv", 1);
-        //CSVReader csvReaderBGlossa = readCSVFile("CsvMassForLeave.csv", 2);
         CSVReader csvReaderMySchool = readCSVFile(s1, 1);
         CSVReader csvReaderBGlossa = readCSVFile(s2, 2);
 
@@ -360,22 +359,6 @@ public class Adeies {
         differences2.addAll(differences1);
         order(differences2);
         removeDuplicateAdeies(differences2);
-
-        if (writeToFile(differences2, "diff.csv")) {
-            out.println("Επιτυχής εγγραφή αρχείου CSV");
-        } else {
-            out.println("Αποτυχία εγγραφή αρχείου CSV");
-        }
-        if (writeToFile(adeiesMySchool, "MySchool.csv")) {
-            out.println("Επιτυχής εγγραφή αρχείου CSV");
-        } else {
-            out.println("Αποτυχία εγγραφή αρχείου CSV");
-        }
-        if (writeToFile(adeiesBGlossa, "bglossa.csv")) {
-            out.println("Επιτυχής εγγραφή αρχείου CSV");
-        } else {
-            out.println("Αποτυχία εγγραφή αρχείου CSV");
-        }
         return differences2;
     } // main end
 } // Class end

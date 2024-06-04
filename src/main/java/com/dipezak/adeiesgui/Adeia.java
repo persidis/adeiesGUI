@@ -1,7 +1,5 @@
 package com.dipezak.adeiesgui;
 
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
@@ -17,8 +15,8 @@ public class Adeia {
     private final StringProperty lastName = new SimpleStringProperty(this, "lastName", "");
     private final StringProperty firstName = new SimpleStringProperty(this, "firstName", "");
     private final StringProperty type = new SimpleStringProperty(this, "type", "");
-    private final ObjectProperty<LocalDate> startDate = new SimpleObjectProperty<>(this, "startDate");
-    private final ObjectProperty<LocalDate> endDate = new SimpleObjectProperty<>(this, "endDate");
+    private  LocalDate startDate = null;
+    private  LocalDate endDate = null;
     private final StringProperty from = new SimpleStringProperty(this, "from", "");
 
     private String matchType(String type) {
@@ -40,6 +38,7 @@ public class Adeia {
             case "ΜΗΤΡΟΤΗΤΑΣ - Προγεννητικού Ελέγχου" -> "ΑΔΕΙΑ ΠΡΟΓΕΝΝΗΤΙΚΩΝ ΕΞΕΤΑΣΕΩΝ";
             case "Παρακολούθησης σχολικής επίδοσης τέκνου" -> "ΑΔΕΙΑ ΠΑΡΑΚΟΛΟΥΘΗΣΗΣ ΣΧΟΛΙΚΗΣ ΕΠΙΔΟΣΗΣ ΤΕΚΝΩΝ";
             case "Πατρότητας" -> "ΑΔΕΙΑ ΠΑΤΡΟΤΗΤΑΣ";
+            case "Για συμμετοχή σε δίκη" -> "ΑΔΕΙΑ ΑΝΥΠΑΙΤΙΟΥ ΚΩΛΥΜΑΤΟΣ (ΔΙΚΗ/ΑΔΥΝ.ΠΡΟΣΕΛ.)";
             default -> type;
         };
     }
@@ -94,27 +93,19 @@ public class Adeia {
     }
 
     public LocalDate getStartDate() {
-        return startDate.get();
-    }
-
-    public void setStartDate(LocalDate startDate) {
-        this.startDate.set(startDate);
-    }
-
-    public ObjectProperty<LocalDate> startDateProperty() {
         return startDate;
     }
 
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
     public LocalDate getEndDate() {
-        return endDate.get();
+        return endDate;
     }
 
     public void setEndDate(LocalDate endDate) {
-        this.endDate.set(endDate);
-    }
-
-    public ObjectProperty<LocalDate> endDateProperty() {
-        return endDate;
+        this.endDate = endDate;
     }
 
     public String getFrom() {
