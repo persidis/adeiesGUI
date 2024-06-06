@@ -48,7 +48,7 @@ public class Adeia {
         return afm.get();
     }
 
-    public void setAfm(String afm) {
+    public final void setAfm(String afm) {
         this.afm.set(afm);
     }
 
@@ -60,7 +60,7 @@ public class Adeia {
         return lastName.get();
     }
 
-    public void setLastName(String lastName) {
+    public final void setLastName(String lastName) {
         this.lastName.set(lastName);
     }
 
@@ -72,7 +72,7 @@ public class Adeia {
         return firstName.get();
     }
 
-    public void setFirstName(String firstName) {
+    public final void setFirstName(String firstName) {
         this.firstName.set(firstName);
     }
 
@@ -84,7 +84,7 @@ public class Adeia {
         return type.get();
     }
 
-    public void setType(String type) {
+    public final void setType(String type) {
         this.type.set(matchType(type));
     }
 
@@ -96,7 +96,7 @@ public class Adeia {
         return startDate;
     }
 
-    public void setStartDate(LocalDate startDate) {
+    public final void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
     }
 
@@ -104,7 +104,7 @@ public class Adeia {
         return endDate;
     }
 
-    public void setEndDate(LocalDate endDate) {
+    public final void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
     }
 
@@ -112,7 +112,7 @@ public class Adeia {
         return from.get();
     }
 
-    public void setFrom(String from) {
+    public final void setFrom(String from) {
         this.from.set(from);
     }
 

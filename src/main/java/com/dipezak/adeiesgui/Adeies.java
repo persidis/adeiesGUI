@@ -14,10 +14,11 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.Period;
 import java.time.temporal.ChronoUnit;
+import java.util.stream.Collectors;
 
 public class Adeies {
 
-    static CSVReader readCSVFile(String fileName, int skipLines) throws IOException {
+    private static CSVReader readCSVFile(String fileName, int skipLines) throws IOException {
         FileReader fileReader = new FileReader(fileName, Charset.forName("ISO-8859-7"));
         CSVParser parser = new CSVParserBuilder()
                 .withSeparator(';')
@@ -45,15 +46,14 @@ public class Adeies {
     }
 
     static void order(List<Adeia> adeies) { // LastName + FirstName + startDate
-                adeies.sort(Comparator
-                        .comparing(Adeia::getLastName)
-                        .thenComparing(Adeia::getFirstName)
-                        .thenComparing(Adeia::getStartDate));
-            }
+        adeies.sort(Comparator
+                .comparing(Adeia::getLastName)
+                .thenComparing(Adeia::getFirstName)
+                .thenComparing(Adeia::getStartDate));
+    }
 
-    static int weekendCount(LocalDate startLocalDate, LocalDate endLocalDate) {
+    private static int weekendCount(LocalDate startLocalDate, LocalDate endLocalDate) {
         long diffInDays = ChronoUnit.DAYS.between(startLocalDate, endLocalDate);
-        System.out.println("\\n startDate: " + startLocalDate.toString() + "  endDate: " + endLocalDate.toString() + "  diff: " + String.valueOf(diffInDays));
         int cnt = 0;
         for (int i = 0; i <= diffInDays; i++) {
             DayOfWeek dayOfWeek = startLocalDate.getDayOfWeek();
@@ -66,7 +66,7 @@ public class Adeies {
         return cnt;
     }
 
-    static int weekendCount(LocalDate startDate, int days) {
+    private static int weekendCount(LocalDate startDate, int days) {
         int cnt = 0;
         for (int i = 1; i <= days; i++) {
             DayOfWeek dayOfWeek = startDate.getDayOfWeek();
@@ -79,7 +79,7 @@ public class Adeies {
         return cnt;
     }
 
-    static void removeDuplicateAdeies(List<Adeia> adeies) {
+    private static void removeDuplicateAdeies(List<Adeia> adeies) {
         int i = 0;
         // Αφαίρεση ίδιων αδειών από Bglossa και MySchool
         while (i < adeies.size() - 1) {
@@ -137,7 +137,7 @@ public class Adeies {
     }
 
     // Ελέγχει αν υπάρχουν συνεχόμενες άδειες χωρίς τα ΣΚ 
-    static void extraMySchoolCheck(List<Adeia> diffList) throws ParseException {
+    private static void checkContinousLeaveWithSK(List<Adeia> diffList) throws ParseException {
         int i = 0;
         // Συνένωση αδειών ασθενείας με συνεχόμενες ημερομηνίες στο MySchool
         while (i < diffList.size() - 1) {
@@ -156,9 +156,11 @@ public class Adeies {
             }
             i++;
         }
-
-        // MySchool - Αν η κανονική άδεια περιλαμβάνει ΣΚ σπάσιμο στα 2
-        i = 0;
+    }
+    
+    // MySchool - Αν η κανονική άδεια περιλαμβάνει ΣΚ σπάσιμο στα 2
+    private static void checkRegularLeaveForSK(List<Adeia> diffList) {
+        int i = 0;
         while (i < diffList.size()) {
             if (diffList.get(i).getType().equals("ΑΔΕΙΑ ΚΑΝΟΝΙΚΗ")) {
                 if (weekendCount(diffList.get(i).getStartDate(), diffList.get(i).getEndDate()) > 0) {
@@ -185,7 +187,7 @@ public class Adeies {
         }
     }
 
-    static void populateMySchool(List<Adeia> adeiesMySchool, CSVReader csvReaderMySchool) throws IOException, CsvValidationException, ParseException {
+    private static void populateMySchool(List<Adeia> adeiesMySchool, CSVReader csvReaderMySchool) throws IOException, CsvValidationException, ParseException {
         String[] nextRecord;
         DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         LocalDate schoolYearStartDate = LocalDate.parse("01/09/2023", dateFormat);
@@ -273,7 +275,7 @@ public class Adeies {
         } // End while
     }
 
-    private static void populateBGlossa(List<Adeia> adeiesBGlossa, CSVReader csvReaderBGlossa) throws IOException, CsvValidationException, ParseException, StringIndexOutOfBoundsException {
+    private static void populatePayroll(List<Adeia> adeiesPayroll, CSVReader csvReaderPayroll) throws IOException, CsvValidationException, ParseException, StringIndexOutOfBoundsException {
         String[] nextRecord;
         int column;
         DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -281,7 +283,7 @@ public class Adeies {
         LocalDate endDate;
         boolean flag = false;
 
-        while ((nextRecord = csvReaderBGlossa.readNext()) != null) {
+        while ((nextRecord = csvReaderPayroll.readNext()) != null) {
             Adeia tempAdeia = new Adeia();
             column = 1;
             for (String cell : nextRecord) {
@@ -334,31 +336,65 @@ public class Adeies {
             }
             if (tempAdeia.getStartDate() != null) {
                 tempAdeia.setFrom("Bglossa");
-                adeiesBGlossa.add(tempAdeia);
+                adeiesPayroll.add(tempAdeia);
             }
         } // End while   
     }
 
-    public static List<Adeia> main(String s1, String s2) throws FileNotFoundException, UnsupportedEncodingException, IOException, CsvValidationException, ParseException {
+    public record PersonKey(String lastName, String firstName) { }
+
+    public static Map<PersonKey, Long> findLongLeavePersons(List<Adeia> adeies) {
+        // Group by PersonKey (last name and first name)
+        Map<PersonKey, List<Adeia>> groupedByPerson = adeies.stream()
+                .collect(Collectors.groupingBy(adeia -> new PersonKey(adeia.getLastName(), adeia.getFirstName())));
+        // Calculate total leave days for each person and filter those with more than 15 days
+        return groupedByPerson.entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> calculateTotalLeaveDays(entry.getValue())))
+                .entrySet().stream()
+                .filter(entry -> entry.getValue() > 15)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
+    private static long calculateTotalLeaveDays(List<Adeia> adeies) {
+        return adeies.stream()
+                .mapToLong(adeia -> ChronoUnit.DAYS.between(adeia.getStartDate(), adeia.getEndDate()) + 1)
+                .sum();
+    }
+
+    public static List<Adeia> createDiffList(String s1, String s2) throws FileNotFoundException, UnsupportedEncodingException, IOException, CsvValidationException, ParseException {
         // PrintStream out = new PrintStream(System.out, true, "UTF-8");
         List<Adeia> adeiesMySchool = new ArrayList<>();
-        List<Adeia> adeiesBGlossa = new ArrayList<>();
+        List<Adeia> adeiesPayroll = new ArrayList<>();
         CSVReader csvReaderMySchool = readCSVFile(s1, 1);
-        CSVReader csvReaderBGlossa = readCSVFile(s2, 2);
-
+        CSVReader csvReaderPayroll = readCSVFile(s2, 2);
         populateMySchool(adeiesMySchool, csvReaderMySchool);
-        populateBGlossa(adeiesBGlossa, csvReaderBGlossa);
-
-        order(adeiesBGlossa);
+        populatePayroll(adeiesPayroll, csvReaderPayroll);
+        order(adeiesPayroll);
         order(adeiesMySchool);
-        extraMySchoolCheck(adeiesMySchool);
-        List<Adeia> differences1 = new ArrayList<>(adeiesBGlossa);
+        checkContinousLeaveWithSK(adeiesMySchool);
+        checkRegularLeaveForSK(adeiesMySchool);
+        List<Adeia> differences1 = new ArrayList<>(adeiesPayroll);
         differences1.removeAll(adeiesMySchool);
         List<Adeia> differences2 = new ArrayList<>(adeiesMySchool);
-        differences2.removeAll(adeiesBGlossa);
+        differences2.removeAll(adeiesPayroll);
         differences2.addAll(differences1);
         order(differences2);
         removeDuplicateAdeies(differences2);
+        writeToFile(adeiesMySchool, "MySchool.csv");
+        writeToFile(adeiesPayroll, "payroll.csv");
         return differences2;
+    } // main end
+
+    // Για εύρεση υπερβάλλουσων αναρρωτικών αδειών
+    public static List<Adeia> createPayrollList(String s2) throws FileNotFoundException, UnsupportedEncodingException, IOException, CsvValidationException, ParseException {
+        // PrintStream out = new PrintStream(System.out, true, "UTF-8");
+        List<Adeia> adeiesPayroll = new ArrayList<>();
+        CSVReader csvReaderPayroll = readCSVFile(s2, 2);
+        populatePayroll(adeiesPayroll, csvReaderPayroll);
+        order(adeiesPayroll);
+        writeToFile(adeiesPayroll, "payroll.csv");
+        return adeiesPayroll;
     } // main end
 } // Class end
