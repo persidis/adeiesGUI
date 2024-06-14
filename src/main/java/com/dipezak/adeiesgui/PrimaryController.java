@@ -6,22 +6,27 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
+import javafx.util.Duration;
 
-public class PrimaryController {
+public class PrimaryController implements Initializable {
 
     private File payrollFile;
     private File mySchoolFile;
@@ -40,6 +45,10 @@ public class PrimaryController {
     private ImageView check1;
     @FXML
     private ImageView check2;
+    @FXML
+    private Tooltip payrollButtonTooltip;
+    @FXML
+    private Tooltip mySchoolButtonTooltip;
 
     @FXML
     private void payrollButtonClicked() throws IOException {
@@ -53,8 +62,7 @@ public class PrimaryController {
             if (mySchoolFile != null) {
                 compareButton.setDisable(false);
             }
-        }
-        else {
+        } else {
             check1.setVisible(false);
             compareButton.setDisable(true);
             numberButton.setDisable(true);
@@ -72,8 +80,7 @@ public class PrimaryController {
             if (payrollFile != null) {
                 compareButton.setDisable(false);
             }
-        }
-        else {
+        } else {
             check2.setVisible(false);
             compareButton.setDisable(true);
         }
@@ -96,7 +103,7 @@ public class PrimaryController {
             errorLabel.setVisible(true);
         }
     }
-    
+
     @FXML
     private void numberButtonClicked() throws IOException, CsvValidationException, ParseException {
         try {
@@ -128,5 +135,13 @@ public class PrimaryController {
         alert.setHeaderText("Αναπληρωτές εκπαιδευτικοί με αναρρωτικές άδειες  > 15 ημερών");
         alert.getDialogPane().setContent(textArea);
         alert.showAndWait();
+    }
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        payrollButtonTooltip.setShowDuration(Duration.seconds(10));
+        payrollButtonTooltip.setShowDelay(Duration.millis(600));
+        mySchoolButtonTooltip.setShowDuration(Duration.seconds(10));
+        mySchoolButtonTooltip.setShowDelay(Duration.millis(600));
     }
 }

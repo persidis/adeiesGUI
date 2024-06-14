@@ -11,35 +11,57 @@ import java.util.Objects;
  * Author: user
  */
 public class Adeia {
+
     private final StringProperty afm = new SimpleStringProperty(this, "afm", "");
     private final StringProperty lastName = new SimpleStringProperty(this, "lastName", "");
     private final StringProperty firstName = new SimpleStringProperty(this, "firstName", "");
     private final StringProperty type = new SimpleStringProperty(this, "type", "");
-    private  LocalDate startDate = null;
-    private  LocalDate endDate = null;
+    private LocalDate startDate = null;
+    private LocalDate endDate = null;
     private final StringProperty from = new SimpleStringProperty(this, "from", "");
 
     private String matchType(String type) {
         return switch (type) {
-            case "Αιμοδοτική", "Αιμοληψίας (σε εργάσιμη ημέρα)" -> "ΑΔΕΙΑ ΑΙΜΟΔΟΣΙΑΣ/ΑΙΜΟΛΗΨΙΑΣ";
-            case "ΑΝΑΡΡΩΤΙΚΗ - με Ιατρική Γνωμάτευση", "ΑΝΑΡΡΩΤΙΚΗ - με Υπεύθυνη Δήλωση", "ΑΝΑΡΡΩΤΙΚΗ - με Γνωμάτευση Νοσοκομείου (ν.3528/2007 άρ.56, παρ.3)" -> "ΑΔΕΙΑ ΑΣΘΕΝΕΙΑΣ";
-            case "Ανατροφής παιδιού (με πλήρεις αποδοχές)" -> "ΑΔΕΙΑ ΑΝΑΤΡΟΦΗΣ ΤΕΚΝΟΥ ΤΡΙΜΗΝΗ (Ν. 4599/2019)";
-            case "Ασθένειας τέκνου" -> "ΑΔΕΙΑ ΑΣΘΕΝΕΙΑΣ ΤΕΚΝΟΥ";
-            case "Γάμου" -> "ΑΔΕΙΑ ΓΑΜΟΥ/ΣΥΜΦΩΝΟΥ ΣΥΜΒΙΩΣΗΣ";
-            case "Για επιμορφωτικούς ή επιστημονικούς λόγους" -> "ΑΔΕΙΑ ΓΙΑ ΕΠΙΣΤΗΜΟΝΙΚΟΥΣ ΚΑΙ ΕΠΙΜΟΡΦΩΤΙΚΟΥΣ ΛΟΓΟΥΣ";
-            case "Για ετήσιο γυναικολογικό έλεγχο" -> "ΑΔΕΙΑ ΕΤΗΣΙΟΥ ΓΥΝΑΙΚΟΛΟΓΙΚΟΥ ΕΛΕΓΧΟΥ";
-            case "Ειδική λόγω Αναπηρίας" -> "ΑΔΕΙΑ ΑΝΑΠΗΡΙΑΣ ΕΙΔΙΚΗ";
-            case "Εκλογική" -> "ΑΔΕΙΑ ΕΚΛΟΓΙΚΗ ΕΙΔΙΚΗ";
-            case "Εξετάσεων" -> "ΑΔΕΙΑ ΕΞΕΤΑΣΕΩΝ (μαθητές, σπουδαστές ή φοιτητές)";
-            case "Θανάτου (συζύγου ή συγγενούς έως και β βαθμού)" -> "ΑΔΕΙΑ ΘΑΝΑΤΟΥ ΣΥΓΓΕΝΟΥΣ";
-            case "Κανονική" -> "ΑΔΕΙΑ ΚΑΝΟΝΙΚΗ";
-            case "ΜΗΤΡΟΤΗΤΑΣ - Κύησης" -> "ΑΔΕΙΑ ΚΥΗΣΗΣ";
-            case "ΜΗΤΡΟΤΗΤΑΣ - Λοχείας" -> "ΑΔΕΙΑ ΛΟΧΕΙΑΣ";
-            case "ΜΗΤΡΟΤΗΤΑΣ - Προγεννητικού Ελέγχου" -> "ΑΔΕΙΑ ΠΡΟΓΕΝΝΗΤΙΚΩΝ ΕΞΕΤΑΣΕΩΝ";
-            case "Παρακολούθησης σχολικής επίδοσης τέκνου" -> "ΑΔΕΙΑ ΠΑΡΑΚΟΛΟΥΘΗΣΗΣ ΣΧΟΛΙΚΗΣ ΕΠΙΔΟΣΗΣ ΤΕΚΝΩΝ";
-            case "Πατρότητας" -> "ΑΔΕΙΑ ΠΑΤΡΟΤΗΤΑΣ";
-            case "Για συμμετοχή σε δίκη" -> "ΑΔΕΙΑ ΑΝΥΠΑΙΤΙΟΥ ΚΩΛΥΜΑΤΟΣ (ΔΙΚΗ/ΑΔΥΝ.ΠΡΟΣΕΛ.)";
-            default -> type;
+            case "Αιμοδοτική", "Αιμοληψίας (σε εργάσιμη ημέρα)" ->
+                "ΑΔΕΙΑ ΑΙΜΟΔΟΣΙΑΣ/ΑΙΜΟΛΗΨΙΑΣ";
+            case "ΑΝΑΡΡΩΤΙΚΗ - με Ιατρική Γνωμάτευση", "ΑΝΑΡΡΩΤΙΚΗ - με Υπεύθυνη Δήλωση", "ΑΝΑΡΡΩΤΙΚΗ - με Γνωμάτευση Νοσοκομείου (ν.3528/2007 άρ.56, παρ.3)" ->
+                "ΑΔΕΙΑ ΑΣΘΕΝΕΙΑΣ";
+            case "Ανατροφής παιδιού (με πλήρεις αποδοχές)" ->
+                "ΑΔΕΙΑ ΑΝΑΤΡΟΦΗΣ ΤΕΚΝΟΥ ΤΡΙΜΗΝΗ (Ν. 4599/2019)";
+            case "Ασθένειας τέκνου" ->
+                "ΑΔΕΙΑ ΑΣΘΕΝΕΙΑΣ ΤΕΚΝΟΥ";
+            case "Γάμου" ->
+                "ΑΔΕΙΑ ΓΑΜΟΥ/ΣΥΜΦΩΝΟΥ ΣΥΜΒΙΩΣΗΣ";
+            case "Για επιμορφωτικούς ή επιστημονικούς λόγους" ->
+                "ΑΔΕΙΑ ΓΙΑ ΕΠΙΣΤΗΜΟΝΙΚΟΥΣ ΚΑΙ ΕΠΙΜΟΡΦΩΤΙΚΟΥΣ ΛΟΓΟΥΣ";
+            case "Για ετήσιο γυναικολογικό έλεγχο" ->
+                "ΑΔΕΙΑ ΕΤΗΣΙΟΥ ΓΥΝΑΙΚΟΛΟΓΙΚΟΥ ΕΛΕΓΧΟΥ";
+            case "Ειδική λόγω Αναπηρίας" ->
+                "ΑΔΕΙΑ ΑΝΑΠΗΡΙΑΣ ΕΙΔΙΚΗ";
+            case "Εκλογική" ->
+                "ΑΔΕΙΑ ΕΚΛΟΓΙΚΗ ΕΙΔΙΚΗ";
+            case "Εξετάσεων" ->
+                "ΑΔΕΙΑ ΕΞΕΤΑΣΕΩΝ (μαθητές, σπουδαστές ή φοιτητές)";
+            case "Θανάτου (συζύγου ή συγγενούς έως και β βαθμού)" ->
+                "ΑΔΕΙΑ ΘΑΝΑΤΟΥ ΣΥΓΓΕΝΟΥΣ";
+            case "Κανονική" ->
+                "ΑΔΕΙΑ ΚΑΝΟΝΙΚΗ";
+            case "ΜΗΤΡΟΤΗΤΑΣ - Κύησης" ->
+                "ΑΔΕΙΑ ΚΥΗΣΗΣ";
+            case "ΜΗΤΡΟΤΗΤΑΣ - Λοχείας" ->
+                "ΑΔΕΙΑ ΛΟΧΕΙΑΣ";
+            case "ΜΗΤΡΟΤΗΤΑΣ - Προγεννητικού Ελέγχου" ->
+                "ΑΔΕΙΑ ΠΡΟΓΕΝΝΗΤΙΚΩΝ ΕΞΕΤΑΣΕΩΝ";
+            case "Παρακολούθησης σχολικής επίδοσης τέκνου" ->
+                "ΑΔΕΙΑ ΠΑΡΑΚΟΛΟΥΘΗΣΗΣ ΣΧΟΛΙΚΗΣ ΕΠΙΔΟΣΗΣ ΤΕΚΝΩΝ";
+            case "Πατρότητας" ->
+                "ΑΔΕΙΑ ΠΑΤΡΟΤΗΤΑΣ";
+            case "Για συμμετοχή σε δίκη" ->
+                "ΑΔΕΙΑ ΑΝΥΠΑΙΤΙΟΥ ΚΩΛΥΜΑΤΟΣ (ΔΙΚΗ/ΑΔΥΝ.ΠΡΟΣΕΛ.)";
+            case "Μονογονεϊκής οικογένειας (εκ χηρείας και στον άγαμο/η γονέα με επιμέλεια τέκνου) - ΙΣΧΥΕΙ ΜΟΝΟ ΓΙΑ ΑΝΑΠΛΗΡΩΤΕΣ" ->
+                "ΑΔΕΙΑ ΜΟΝΟΓΟΝΕΪΚΕΣ ΟΙΚΟΓΕΝΕΙΕΣ";
+            default ->
+                type;
         };
     }
 
@@ -123,9 +145,9 @@ public class Adeia {
     @Override
     public String toString() {
         DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        return "afm=" + getAfm() + "\t lastName=" + getLastName() + "\t firstName=" + getFirstName() +
-                "\t type=" + getType() + "\t startDate=" + (getStartDate() != null ? dateFormat.format(getStartDate()) : "null") +
-                "\t endDate=" + (getEndDate() != null ? dateFormat.format(getEndDate()) : "null") + '\n';
+        return "afm=" + getAfm() + "\t lastName=" + getLastName() + "\t firstName=" + getFirstName()
+                + "\t type=" + getType() + "\t startDate=" + (getStartDate() != null ? dateFormat.format(getStartDate()) : "null")
+                + "\t endDate=" + (getEndDate() != null ? dateFormat.format(getEndDate()) : "null") + '\n';
     }
 
     @Override
@@ -137,12 +159,12 @@ public class Adeia {
             return false;
         }
         Adeia that = (Adeia) o;
-        return Objects.equals(getAfm(), that.getAfm()) &&
-               Objects.equals(getLastName(), that.getLastName()) &&
-               Objects.equals(getFirstName(), that.getFirstName()) &&
-               Objects.equals(getType(), that.getType()) &&
-               Objects.equals(getStartDate(), that.getStartDate()) &&
-               Objects.equals(getEndDate(), that.getEndDate());
+        return Objects.equals(getAfm(), that.getAfm())
+                && Objects.equals(getLastName(), that.getLastName())
+                && Objects.equals(getFirstName(), that.getFirstName())
+                && Objects.equals(getType(), that.getType())
+                && Objects.equals(getStartDate(), that.getStartDate())
+                && Objects.equals(getEndDate(), that.getEndDate());
     }
 
     @Override
@@ -152,10 +174,10 @@ public class Adeia {
 
     public String toCSVString() {
         DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        return "\'" + getAfm() + "\';" + getLastName() + ";" + getFirstName() + ";" + getType() + ";" +
-                (getStartDate() != null ? dateFormat.format(getStartDate()) : "") + ";" +
-                (getEndDate() != null ? dateFormat.format(getEndDate()) : "") + ";" +
-                getFrom() + '\n';
+        return "\'" + getAfm() + "\';" + getLastName() + ";" + getFirstName() + ";" + getType() + ";"
+                + (getStartDate() != null ? dateFormat.format(getStartDate()) : "") + ";"
+                + (getEndDate() != null ? dateFormat.format(getEndDate()) : "") + ";"
+                + getFrom() + '\n';
     }
 
     public Adeia() {

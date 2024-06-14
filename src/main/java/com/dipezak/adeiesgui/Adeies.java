@@ -157,23 +157,25 @@ public class Adeies {
             i++;
         }
     }
-    
+
     // MySchool - Αν η κανονική άδεια περιλαμβάνει ΣΚ σπάσιμο στα 2
     private static void checkRegularLeaveForSK(List<Adeia> diffList) {
         int i = 0;
         while (i < diffList.size()) {
-            if (diffList.get(i).getType().equals("ΑΔΕΙΑ ΚΑΝΟΝΙΚΗ")) {
+            if (diffList.get(i).getType().equals("ΑΔΕΙΑ ΚΑΝΟΝΙΚΗ") || diffList.get(i).getType().equals("ΑΔΕΙΑ ΓΙΑ ΕΠΙΣΤΗΜΟΝΙΚΟΥΣ ΚΑΙ ΕΠΙΜΟΡΦΩΤΙΚΟΥΣ ΛΟΓΟΥΣ")) {
                 if (weekendCount(diffList.get(i).getStartDate(), diffList.get(i).getEndDate()) > 0) {
                     LocalDate startDateLocalDate = diffList.get(i).getStartDate();
                     LocalDate endDateLocalDate = diffList.get(i).getEndDate();
                     long diffInDays = ChronoUnit.DAYS.between(startDateLocalDate, endDateLocalDate);
                     Adeia ending = new Adeia(diffList.get(i));
                     LocalDate tempDate = diffList.get(i).getStartDate();
-
-                    for (int j = 1; j < diffInDays; j++) {
+                    boolean fridayFound = false;
+                    for (int j = 0; j < diffInDays; j++) {
                         DayOfWeek dayOfWeek = tempDate.getDayOfWeek();
-                        if (dayOfWeek == DayOfWeek.FRIDAY) {
+                        if ((dayOfWeek == DayOfWeek.FRIDAY) && !fridayFound) {
+                            fridayFound = true;
                             diffList.get(i).setEndDate(tempDate);
+                            ending.setEndDate(ending.getStartDate().plusDays(diffInDays));
                             tempDate = tempDate.plusDays(3);
                             ending.setStartDate(tempDate);
                             diffList.add(i + 1, ending);
@@ -257,7 +259,9 @@ public class Adeies {
                     }
                     case 26 -> {
                         LocalDate endDate = tempAdeia.getStartDate().plusDays(Integer.parseInt(cell) - 1);
-                        if ("ΑΔΕΙΑ ΠΑΤΡΟΤΗΤΑΣ".equals(tempAdeia.getType()) || "ΑΔΕΙΑ ΚΑΝΟΝΙΚΗ".equals(tempAdeia.getType())) {
+                        if ("ΑΔΕΙΑ ΠΑΤΡΟΤΗΤΑΣ".equals(tempAdeia.getType())
+                                || "ΑΔΕΙΑ ΚΑΝΟΝΙΚΗ".equals(tempAdeia.getType())
+                                || "ΑΔΕΙΑ ΓΙΑ ΕΠΙΣΤΗΜΟΝΙΚΟΥΣ ΚΑΙ ΕΠΙΜΟΡΦΩΤΙΚΟΥΣ ΛΟΓΟΥΣ".equals(tempAdeia.getType())) {
                             endDate = endDate.plusDays(weekendCount(tempAdeia.getStartDate(), endDate));
                         }
                         tempAdeia.setEndDate(endDate);
@@ -382,8 +386,8 @@ public class Adeies {
         differences2.addAll(differences1);
         order(differences2);
         removeDuplicateAdeies(differences2);
-        writeToFile(adeiesMySchool, "MySchool.csv");
-        writeToFile(adeiesPayroll, "payroll.csv");
+        //writeToFile(adeiesMySchool, "MySchool.csv");
+        // writeToFile(adeiesPayroll, "payroll.csv");
         return differences2;
     } // main end
 
@@ -394,7 +398,7 @@ public class Adeies {
         CSVReader csvReaderPayroll = readCSVFile(s2, 2);
         populatePayroll(adeiesPayroll, csvReaderPayroll);
         order(adeiesPayroll);
-        writeToFile(adeiesPayroll, "payroll.csv");
+        // writeToFile(adeiesPayroll, "payroll.csv");
         return adeiesPayroll;
     } // main end
 } // Class end

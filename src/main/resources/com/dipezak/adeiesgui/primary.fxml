@@ -4,6 +4,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.ColumnConstraints?>
@@ -32,13 +33,25 @@
                 <RowConstraints maxHeight="20.0" minHeight="0.0" prefHeight="11.0" vgrow="SOMETIMES" />
             </rowConstraints>
             <children>
-                <Button fx:id="payrollButton" onAction="#payrollButtonClicked" styleClass="button-glass-grey" stylesheets="@style.css" text="Payroll CSV" GridPane.halignment="RIGHT" />
+                <Button fx:id="payrollButton" onAction="#payrollButtonClicked" styleClass="button-glass-grey" stylesheets="@style.css" text="Payroll CSV" GridPane.halignment="RIGHT">
+               <tooltip>
+                  <Tooltip fx:id="payrollButtonTooltip" text="Για να κατεβάσετε το Payroll CSV πατήστε Μισθοδοσία - Άδεια - Μαζική εξαγωγή σε CSV" textAlignment="JUSTIFY" width="100.0" wrapText="true">
+                     <font>
+                        <Font size="13.0" />
+                     </font></Tooltip>
+               </tooltip></Button>
                 <ImageView fx:id="check1" fitHeight="20.0" fitWidth="20.0" visible="false" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="0">
                     <image>
                         <Image url="@check_icon.png" />
                     </image>
                 </ImageView>
-                <Button fx:id="mySchoolButton" mnemonicParsing="false" onAction="#mySchoolButtonClicked" styleClass="button-glass-grey" text="MySchool CSV" GridPane.columnIndex="2" GridPane.halignment="RIGHT" />
+                <Button fx:id="mySchoolButton" mnemonicParsing="false" onAction="#mySchoolButtonClicked" styleClass="button-glass-grey" text="MySchool CSV" GridPane.columnIndex="2" GridPane.halignment="RIGHT">
+               <tooltip>
+                  <Tooltip fx:id="mySchoolButtonTooltip" maxWidth="400" text="Για να κατεβάσετε το MySchool CSV πατήστε Στατιστικά - 4. Στατιστικά Εκπαιδευτικών - 21. Άδειες (πλην Άνευ Αποδοχών). Στη συνέχεια επιλέγετε τα τρέχοντα έτη, όλες τις άδειες, πατάτε Αναζήτηση και Εξαγωγή." textAlignment="JUSTIFY" width="100.0" wrapText="true">
+                     <font>
+                        <Font size="13.0" />
+                     </font></Tooltip>
+               </tooltip></Button>
                 <ImageView fx:id="check2" fitHeight="20.0" fitWidth="20.0" visible="false" GridPane.columnIndex="3" GridPane.halignment="LEFT" GridPane.rowIndex="0">
                     <image>
                         <Image url="@check_icon.png" />
