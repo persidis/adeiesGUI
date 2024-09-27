@@ -25,6 +25,11 @@
             <artifactId>javafx-fxml</artifactId>
             <version>21</version>
         </dependency>
+        <dependency>
+            <groupId>org.controlsfx</groupId>
+            <artifactId>controlsfx</artifactId>
+            <version>11.2.1</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -73,6 +78,7 @@
                 <version>3.12.1</version>
                 <configuration>
                     <release>21</release>
+                    <showDeprecation>true</showDeprecation>
                 </configuration>
             </plugin>
             <plugin>
