@@ -189,10 +189,10 @@ public class Adeies {
         }
     }
 
-    private static void populateMySchool(List<Adeia> adeiesMySchool, CSVReader csvReaderMySchool) throws IOException, CsvValidationException, ParseException {
+    private static void populateMySchool(List<Adeia> adeiesMySchool, CSVReader csvReaderMySchool, String schYearStartDate) throws IOException, CsvValidationException, ParseException {
         String[] nextRecord;
         DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        LocalDate schoolYearStartDate = LocalDate.parse("01/09/2023", dateFormat);
+        LocalDate schoolYearStartDate = LocalDate.parse(schYearStartDate, dateFormat);
         boolean flag = false;
 
         while ((nextRecord = csvReaderMySchool.readNext()) != null) {
@@ -259,6 +259,10 @@ public class Adeies {
                     }
                     case 26 -> {
                         LocalDate endDate = tempAdeia.getStartDate().plusDays(Integer.parseInt(cell) - 1);
+                        if (endDate.isAfter(schoolYearStartDate.plusYears(1))) {
+                            flag = true;
+                            break;
+                        }
                         if ("ΑΔΕΙΑ ΠΑΤΡΟΤΗΤΑΣ".equals(tempAdeia.getType())
                                 || "ΑΔΕΙΑ ΚΑΝΟΝΙΚΗ".equals(tempAdeia.getType())
                                 || "ΑΔΕΙΑ ΓΙΑ ΕΠΙΣΤΗΜΟΝΙΚΟΥΣ ΚΑΙ ΕΠΙΜΟΡΦΩΤΙΚΟΥΣ ΛΟΓΟΥΣ".equals(tempAdeia.getType())) {
@@ -272,7 +276,7 @@ public class Adeies {
                 column++;
             }
             // Αν είναι αναπληρωτής + δεν ανακλήθηκε + δεν είναι πριν από αρχή σχολ. χρονιάς ++
-            if (tempAdeia.getStartDate() != null) {
+            if (tempAdeia.getEndDate() != null) {
                 tempAdeia.setFrom("MySchool");
                 adeiesMySchool.add(tempAdeia);
             }
@@ -367,13 +371,13 @@ public class Adeies {
                 .sum();
     }
 
-    public static List<Adeia> createDiffList(String s1, String s2) throws FileNotFoundException, UnsupportedEncodingException, IOException, CsvValidationException, ParseException {
+    public static List<Adeia> createDiffList(String s1, String s2, String schoolYearStartDate) throws FileNotFoundException, UnsupportedEncodingException, IOException, CsvValidationException, ParseException {
         // PrintStream out = new PrintStream(System.out, true, "UTF-8");
         List<Adeia> adeiesMySchool = new ArrayList<>();
         List<Adeia> adeiesPayroll = new ArrayList<>();
         CSVReader csvReaderMySchool = readCSVFile(s1, 1);
         CSVReader csvReaderPayroll = readCSVFile(s2, 2);
-        populateMySchool(adeiesMySchool, csvReaderMySchool);
+        populateMySchool(adeiesMySchool, csvReaderMySchool, schoolYearStartDate);
         populatePayroll(adeiesPayroll, csvReaderPayroll);
         order(adeiesPayroll);
         order(adeiesMySchool);

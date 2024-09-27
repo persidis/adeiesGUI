@@ -20,6 +20,8 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
@@ -49,6 +51,8 @@ public class PrimaryController implements Initializable {
     private Tooltip payrollButtonTooltip;
     @FXML
     private Tooltip mySchoolButtonTooltip;
+     @FXML
+    private Spinner<String> spinnerControl;
 
     @FXML
     private void payrollButtonClicked() throws IOException {
@@ -89,7 +93,9 @@ public class PrimaryController implements Initializable {
     @FXML
     private void compareButtonClicked() throws IOException {
         try {
-            List<Adeia> diffs = Adeies.createDiffList(mySchoolFile.getCanonicalPath(), payrollFile.getCanonicalPath());
+            String spinnerValue = spinnerControl.getValue();
+            String startDate = "01/09/20" + spinnerValue.substring(2, 4);
+            List<Adeia> diffs = Adeies.createDiffList(mySchoolFile.getCanonicalPath(), payrollFile.getCanonicalPath(), startDate);
             FXMLLoader loader = new FXMLLoader(App.class.getResource("secondary.fxml"));
             Parent sec = loader.load();
             SecondaryController controller = (SecondaryController) loader.getController();
@@ -143,5 +149,14 @@ public class PrimaryController implements Initializable {
         payrollButtonTooltip.setShowDelay(Duration.millis(600));
         mySchoolButtonTooltip.setShowDuration(Duration.seconds(10));
         mySchoolButtonTooltip.setShowDelay(Duration.millis(600));
+        // Create a list of school years for the spinner
+        SpinnerValueFactory<String> valueFactory = new SpinnerValueFactory.ListSpinnerValueFactory<>(
+                javafx.collections.FXCollections.observableArrayList(
+                        "2022-2023", "2023-2024", "2024-2025", "2025-2026", "2026-2027", "2027-2028", "2028-2029", "2029-2030", "2030-2031"
+                )
+        );
+        // Set the default value
+        valueFactory.setValue("2024-2025");
+        spinnerControl.setValueFactory(valueFactory);
     }
 }
